@@ -17,19 +17,20 @@ def display_applications():
         df = df.fillna('')
         # Prepare data for template: group by username, handle bad data
         users = []
+        question_columns = [col for col in df.columns if col not in ['Verified Perma/Username', 'Reddit username', 'Communities', 'Karma', 'Verified Email?', 'Account Age', 'Banned?', 'Timestamp']]
         for index, row in df.iterrows():
             username = str(row['Verified Perma/Username']).strip()
-            if not username or username.lower() in ['true', 'false', 'nan', '']:  # Handle invalid entries
+            if not username or username.lower() in ['true', 'false', 'nan', '']:
                 username = str(row['Reddit username']).strip() or f"Unknown_User_{index}"
             communities = str(row['Communities']).strip()
             user_data = {
+                'user_id': index,  # Unique ID for each user
                 'username': username,
                 'communities': communities if communities else 'N/A',
                 'responses': [
-                    {'question': col, 'answer': str(row[col]).strip() if pd.notna(row[col]) else ''}
-                    for col in df.columns
-                    if col not in ['Verified Perma/Username', 'Reddit username', 'Communities']
-                    and col not in ['Karma', 'Verified Email?', 'Account Age', 'Banned?', 'Timestamp']  # Exclude metadata
+                    {'question': q, 'answer': str(row[q]).strip() if pd.notna(row[q]) else ''}
+                    for q in question_columns
+                    if str(row[q]).strip()  # Only include non-empty answers
                 ]
             }
             users.append(user_data)
