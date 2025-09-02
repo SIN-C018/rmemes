@@ -2,127 +2,139 @@
 <html lang="en" class="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>/r/memes Mod Application</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>r/memes Moderator Applications</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+
   <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
-    /* Smooth height transition */
+    body {
+      font-family: 'Inter', sans-serif;
+    }
     .collapsible {
       max-height: 0;
       overflow: hidden;
-      transition: max-height 0.4s ease, opacity 0.3s ease;
-      opacity: 0;
+      transition: max-height 0.5s ease-in-out;
     }
-    .collapsible.open {
-      opacity: 1;
-      max-height: 500px;
+    .collapsible.is-open {
+      max-height: 1500px; /* A large value to ensure all content is visible */
     }
     .chevron {
-      transition: transform 0.3s ease;
+      transition: transform 0.3s ease-in-out;
     }
-    .chevron.rotate {
-      transform: rotate(90deg);
+    .chevron.is-rotated {
+      transform: rotate(180deg);
     }
   </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen">
   <div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-6 text-center">/r/memes Moderator Application_9th</h1>
+    <h1 class="text-3xl font-bold mb-6 text-center">r/memes Moderator Applications</h1>
 
-    <!-- 🔍 Search Bar -->
     <div class="mb-6">
-     <input type="text" id="searchBar" placeholder="Search by username..."
-        class="w-full px-4 py-2 mb-6 rounded-lg bg-gray-800 text-white placeholder-gray-400 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
+      <input 
+          type="text" 
+          id="searchInput"
+          placeholder="Search by username..."
+          class="w-full bg-gray-700 border border-gray-600 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+      />
     </div>
 
-    <!-- Desktop Table -->
-    <div class="hidden md:block bg-gray-800 shadow-lg rounded-lg overflow-hidden">
-      <table class="min-w-full divide-y divide-gray-700">
-        <thead class="bg-gray-700">
-          <tr>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Username</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Question</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Answer</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-700">
-          {% for user in users %}
-            <!-- Clickable Username Row -->
-            <tr class="username-row cursor-pointer hover:bg-gray-700 transition user-item" data-toggle="{{ user.user_id }}">
-              <td class="px-6 py-4 text-blue-400 font-medium flex items-center gap-2">
-                <span class="username-text">{{ user.username }}</span>
-                <svg class="chevron w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-                </svg>
-              </td>
-              <td class="px-6 py-4 italic text-sm text-gray-400">Click to toggle responses</td>
-              <td></td>
-            </tr>
-
-            <!-- User Responses -->
-            <tr class="response-row">
-              <td colspan="3" class="p-0">
-                <div class="collapsible" data-user="{{ user.user_id }}">
-                  <table class="w-full">
-                    {% for response in user.responses %}
-                      <tr class="hover:bg-gray-800 transition">
-                        <td class="px-6 py-4 text-sm text-gray-300 w-1/2">{{ response.question }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-200">{{ response.answer }}</td>
-                      </tr>
-                    {% endfor %}
-                  </table>
-                </div>
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Mobile Cards -->
-    <div class="md:hidden space-y-4">
-      {% for user in users %}
-      <div class="bg-gray-800 shadow-lg rounded-lg p-4 user-item">
-        <div class="flex justify-between items-center cursor-pointer username-row" data-toggle="{{ user.user_id }}">
-          <h2 class="text-lg font-semibold text-blue-400 username-text">{{ user.username }}</h2>
-          <svg class="chevron w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-          </svg>
+    <div class="hidden md:block">
+        <div class="bg-gray-800 shadow-lg rounded-lg">
+            <table class="min-w-full">
+                <thead class="bg-gray-700">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider w-1/4">Username</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider w-1/3">Question</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Answer</th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-700">
+                {% for user in users %}
+                    <tr class="user-entry-desktop username-row cursor-pointer hover:bg-gray-700 transition" data-target="#collapsible-desktop-{{ user.user_id }}" data-username="{{ user.username }}">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center text-blue-400 font-medium">
+                        <span>{{ user.username }}</span>
+                        <svg class="chevron w-5 h-5 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 italic text-sm text-gray-400">Click to toggle responses</td>
+                    <td></td>
+                    </tr>
+                    <tr class="user-entry-desktop" data-username="{{ user.username }}">
+                    <td colspan="3" class="p-0">
+                        <div class="collapsible" id="collapsible-desktop-{{ user.user_id }}">
+                        <table class="w-full">
+                            <tbody>
+                            {% for response in user.responses %}
+                                <tr class="{% if not loop.first %}border-t border-gray-700{% endif %}">
+                                <td class="w-1/4 px-6 py-3"></td>
+                                <td class="w-1/3 px-6 py-3 text-sm text-gray-300">{{ response.question }}</td>
+                                <td class="px-6 py-3 text-sm text-gray-200">{{ response.answer }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        </div>
+                    </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
-        <div class="collapsible mt-3" data-user="{{ user.user_id }}">
+    </div>
+
+    <div class="block md:hidden space-y-4">
+  {% for user in users %}
+    <div class="user-entry-mobile bg-gray-800 rounded-lg shadow-lg overflow-hidden" data-username="{{ user.username }}">
+      <div class="username-row flex justify-between items-center p-4 cursor-pointer" data-target="#collapsible-mobile-{{ user.user_id }}">
+        <span class="text-blue-400 font-medium">{{ user.username }}</span>
+        <svg class="chevron w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+      </div>
+      <div class="collapsible" id="collapsible-mobile-{{ user.user_id }}">
+        <div class="px-4 pb-4 border-t border-gray-700">
           {% for response in user.responses %}
-            <div class="border-t border-gray-700 py-2">
-              <p class="text-sm text-gray-400 font-medium">{{ response.question }}</p>
-              <p class="text-sm text-gray-200">{{ response.answer }}</p>
+            <div class="py-2 {% if not loop.last %}border-b border-gray-700{% endif %}">
+              <p class="font-medium text-sm text-gray-400">{{ response.question }}</p>
+              <p class="text-sm text-gray-200 mt-1">{{ response.answer }}</p>
             </div>
           {% endfor %}
         </div>
       </div>
-      {% endfor %}
     </div>
+  {% endfor %}
+</div>
+
   </div>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      // Toggle responses
-      document.querySelectorAll(".username-row").forEach((row) => {
+      document.querySelectorAll(".username-row").forEach(row => {
         row.addEventListener("click", () => {
-          const userId = row.getAttribute("data-toggle");
-          const collapsible = document.querySelectorAll(`.collapsible[data-user="${userId}"]`);
+          const targetId = row.dataset.target;
+          const collapsible = document.querySelector(targetId);
           const chevron = row.querySelector(".chevron");
 
-          collapsible.forEach(section => section.classList.toggle("open"));
-          chevron.classList.toggle("rotate");
+          if (collapsible) collapsible.classList.toggle("is-open");
+          if (chevron) chevron.classList.toggle("is-rotated");
         });
       });
 
-      // Live search filter
-      const searchInput = document.getElementById("search");
-      searchInput.addEventListener("input", (e) => {
-        const term = e.target.value.toLowerCase();
-        document.querySelectorAll(".user-item").forEach((item) => {
-          const username = item.querySelector(".username-text").textContent.toLowerCase();
-          item.style.display = username.includes(term) ? "" : "none";
+      document.getElementById("searchInput").addEventListener("keyup", (e) => {
+        const filter = e.target.value.toLowerCase();
+        
+        document.querySelectorAll(".user-entry-desktop, .user-entry-mobile").forEach(entry => {
+          const username = entry.dataset.username.toLowerCase();
+          if (username.includes(filter)) {
+            entry.style.display = "";
+          } else {
+            entry.style.display = "none";
+          }
         });
       });
     });
