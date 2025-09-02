@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Moderator Applications</title>
+  <title>/r/memes Mod Application</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     /* Smooth height transition */
@@ -15,7 +15,7 @@
     }
     .collapsible.open {
       opacity: 1;
-      max-height: 500px; /* Enough height for most responses */
+      max-height: 500px;
     }
     .chevron {
       transition: transform 0.3s ease;
@@ -29,7 +29,18 @@
   <div class="container mx-auto px-4 py-8">
     <h1 class="text-3xl font-bold mb-6 text-center">/r/memes Moderator Application_9th</h1>
 
-    <div class="bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+    <!-- 🔍 Search Bar -->
+    <div class="mb-6">
+      <input
+        type="text"
+        id="search"
+        placeholder="Search username..."
+        class="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+
+    <!-- Desktop Table -->
+    <div class="hidden md:block bg-gray-800 shadow-lg rounded-lg overflow-hidden">
       <table class="min-w-full divide-y divide-gray-700">
         <thead class="bg-gray-700">
           <tr>
@@ -41,9 +52,9 @@
         <tbody class="divide-y divide-gray-700">
           {% for user in users %}
             <!-- Clickable Username Row -->
-            <tr class="username-row cursor-pointer hover:bg-gray-700 transition" data-toggle="{{ user.user_id }}">
+            <tr class="username-row cursor-pointer hover:bg-gray-700 transition user-item" data-toggle="{{ user.user_id }}">
               <td class="px-6 py-4 text-blue-400 font-medium flex items-center gap-2">
-                <span>{{ user.username }}</span>
+                <span class="username-text">{{ user.username }}</span>
                 <svg class="chevron w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
                 </svg>
@@ -71,18 +82,51 @@
         </tbody>
       </table>
     </div>
+
+    <!-- Mobile Cards -->
+    <div class="md:hidden space-y-4">
+      {% for user in users %}
+      <div class="bg-gray-800 shadow-lg rounded-lg p-4 user-item">
+        <div class="flex justify-between items-center cursor-pointer username-row" data-toggle="{{ user.user_id }}">
+          <h2 class="text-lg font-semibold text-blue-400 username-text">{{ user.username }}</h2>
+          <svg class="chevron w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+          </svg>
+        </div>
+        <div class="collapsible mt-3" data-user="{{ user.user_id }}">
+          {% for response in user.responses %}
+            <div class="border-t border-gray-700 py-2">
+              <p class="text-sm text-gray-400 font-medium">{{ response.question }}</p>
+              <p class="text-sm text-gray-200">{{ response.answer }}</p>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
   </div>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
+      // Toggle responses
       document.querySelectorAll(".username-row").forEach((row) => {
         row.addEventListener("click", () => {
           const userId = row.getAttribute("data-toggle");
-          const collapsible = document.querySelector(`.collapsible[data-user="${userId}"]`);
+          const collapsible = document.querySelectorAll(`.collapsible[data-user="${userId}"]`);
           const chevron = row.querySelector(".chevron");
 
-          collapsible.classList.toggle("open");
+          collapsible.forEach(section => section.classList.toggle("open"));
           chevron.classList.toggle("rotate");
+        });
+      });
+
+      // Live search filter
+      const searchInput = document.getElementById("search");
+      searchInput.addEventListener("input", (e) => {
+        const term = e.target.value.toLowerCase();
+        document.querySelectorAll(".user-item").forEach((item) => {
+          const username = item.querySelector(".username-text").textContent.toLowerCase();
+          item.style.display = username.includes(term) ? "" : "none";
         });
       });
     });
