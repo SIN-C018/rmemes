@@ -3,56 +3,86 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>r/memes Moderator Applications</title>
+  <title>Moderator Applications</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Smooth height transition */
+    .collapsible {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, opacity 0.3s ease;
+      opacity: 0;
+    }
+    .collapsible.open {
+      opacity: 1;
+      max-height: 500px; /* Enough height for most responses */
+    }
+    .chevron {
+      transition: transform 0.3s ease;
+    }
+    .chevron.rotate {
+      transform: rotate(90deg);
+    }
+  </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen">
   <div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-6">r/memes Moderator Applications</h1>
-    <div class="bg-gray-800 shadow-lg rounded-lg overflow-x-auto">
+    <h1 class="text-3xl font-bold mb-6 text-center">/r/memes Moderator Application_9th</h1>
+
+    <div class="bg-gray-800 shadow-lg rounded-lg overflow-hidden">
       <table class="min-w-full divide-y divide-gray-700">
         <thead class="bg-gray-700">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Username</th>
-            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Question</th>
-            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Answer</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Username</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Question</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Answer</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-700">
           {% for user in users %}
             <!-- Clickable Username Row -->
             <tr class="username-row cursor-pointer hover:bg-gray-700 transition" data-toggle="{{ user.user_id }}">
-              <td class="px-6 py-4 text-blue-400 hover:underline font-medium">
-                {{ user.username }}
+              <td class="px-6 py-4 text-blue-400 font-medium flex items-center gap-2">
+                <span>{{ user.username }}</span>
+                <svg class="chevron w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                </svg>
               </td>
               <td class="px-6 py-4 italic text-sm text-gray-400">Click to toggle responses</td>
               <td></td>
             </tr>
+
             <!-- User Responses -->
-            {% for response in user.responses %}
-              <tr class="response-row hidden" data-user="{{ user.user_id }}">
-                <td></td>
-                <td class="px-6 py-4 text-sm max-w-[500px] break-words text-gray-300">
-                  {{ response.question }}
-                </td>
-                <td class="px-6 py-4 text-sm max-w-[500px] break-words text-gray-200">
-                  {{ response.answer }}
-                </td>
-              </tr>
-            {% endfor %}
+            <tr class="response-row">
+              <td colspan="3" class="p-0">
+                <div class="collapsible" data-user="{{ user.user_id }}">
+                  <table class="w-full">
+                    {% for response in user.responses %}
+                      <tr class="hover:bg-gray-800 transition">
+                        <td class="px-6 py-4 text-sm text-gray-300 w-1/2">{{ response.question }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-200">{{ response.answer }}</td>
+                      </tr>
+                    {% endfor %}
+                  </table>
+                </div>
+              </td>
+            </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
   </div>
+
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       document.querySelectorAll(".username-row").forEach((row) => {
         row.addEventListener("click", () => {
           const userId = row.getAttribute("data-toggle");
-          // Toggle only the responses for the clicked user
-          document.querySelectorAll(`.response-row[data-user="${userId}"]`)
-            .forEach(r => r.classList.toggle("hidden"));
+          const collapsible = document.querySelector(`.collapsible[data-user="${userId}"]`);
+          const chevron = row.querySelector(".chevron");
+
+          collapsible.classList.toggle("open");
+          chevron.classList.toggle("rotate");
         });
       });
     });
